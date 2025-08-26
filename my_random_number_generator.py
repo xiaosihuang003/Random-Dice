@@ -1,26 +1,24 @@
+import time
+
 class My_Random:
     def __init__(self):
         self.seed = None
 
-    def set_seed(self, seed: int):
-        """Set the initial seed (must be a 4-digit integer)"""
-        seed_str = str(seed).zfill(4)
-        self.seed = int(seed_str)
+    def set_seed(self, seed=None):
+        """Set the initial seed. If None, use last 4 digits of current time in milliseconds."""
+        if seed is None:
+            self.seed = int(str(int(time.time() * 1000))[-4:])
+        else:
+            self.seed = int(seed)
 
-    def dice(self) -> int:
-        """Return a random number 1-6 and update the seed"""
-        if self.seed is None:
-            raise ValueError("Please call set_seed(seed) first to set the initial value")
-        
-        # (b) Square the seed
-        squared = self.seed * self.seed
-        
-        # (c) Pad with leading zeros to make 8 digits
-        squared_str = str(squared).zfill(8)
-        
-        # (d) Take the middle four digits as new seed
-        new_seed = int(squared_str[2:6])
-        self.seed = new_seed
-        
-        # (e) Return dice number (mod 6 + 1)
-        return (new_seed % 6) + 1
+    def dice(self):
+        """Generate a dice number 1..6 using the middle-square method."""
+        # 1) square the seed
+        num = self.seed * self.seed
+        # 2) pad to 8 digits with leading zeros
+        s = str(num).zfill(8)
+        # 3) take the middle four digits as the new seed
+        mid = len(s) // 2
+        self.seed = int(s[mid - 2: mid + 2])
+        # 4) map to 1..6
+        return self.seed % 6 + 1
